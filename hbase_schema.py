@@ -6,7 +6,7 @@ con=happybase.Connection(Master2)
 con.open()
 alltable = con.tables()
 
-creatingTable=False
+creatingTable=True
 # Reset Delete Table
 # con.delete_table('MetaTable',disable=True)
 # con.delete_table('EncTable',disable=True)
@@ -19,14 +19,15 @@ if creatingTable:
         print "Creating table : " + 'MetaTable'
         con.create_table(
         'MetaTable',{
-                'pp':dict(max_versions=1)
+                'pp':dict(max_versions=1,bloom_filter_type='ROW', block_cache_enabled=True)
             }
         )
         print "Creating table : " + 'EncTable'
         con.create_table(
         'EncTable',{
-                'enc':dict(max_versions=1)
+                'enc':dict(max_versions=1,bloom_filter_type='ROW', block_cache_enabled=True)
             }
+
         )
     metaTable = con.table('MetaTable')
     encTable = con.table('EncTable')

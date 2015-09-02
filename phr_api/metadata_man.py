@@ -5,8 +5,11 @@ import os
 import time, uuid, hashlib,sha3
 import happybase
 from phr_api import Master,MasterHbase, HDFSMainPath, largeSize, app
+import timeit
 
 def genMeta(path, formdata):
+    start = timeit.default_timer()
+
     size = os.path.getsize(path)
     filename = os.path.basename(path)
     dataid = str(uuid.uuid4())
@@ -28,6 +31,8 @@ def genMeta(path, formdata):
     else:
         description = ''
     rowkey = formdata['sysid']+'-'+formdata['userid']+'-'+timestamp+'-'+dataid
+    stop=timeit.default_timer()
+    app.logger.debug('Time to genMeta is %f' % (stop-start))
     return {
         'sysid': formdata['sysid'],
         'userid': formdata['userid'],
