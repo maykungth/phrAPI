@@ -47,14 +47,53 @@ def genMeta(path, formdata):
     }
 
 def getMeta(data_id):
+    start = timeit.default_timer()
     con = happybase.Connection(MasterHbase)
+
     con.open()
     meta_table = con.table('MetaTable')
     meta_row = meta_table.row(str(data_id))
     con.close()
+    stop = timeit.default_timer()
+    app.logger.debug('Time to getMeta %f'%(float(stop-start)))
     if meta_row == {}:
         return None
     return meta_row
 
-def searchMeta(meta):
-    pass
+def searchMeta(formdata):
+    con = happybase.Connection(MasterHbase)
+    con.open()
+    meta_table = con.table('MetaTable')
+    meta=[{'Total':0}]
+
+    if 'starttime' in formdata and 'endtime' in formdata:
+        print("startttttt end endddd")
+        rowstart = str(formdata['sysid']) + '-' + str(formdata['userid'])+'-' + str(formdata['starttime']) + '-'
+        rowend = str(formdata['sysid']) + '-' + str(formdata['userid'])+'-'+str(int(formdata['endtime'])+1) + '-'
+        for key, data in meta_table.scan(row_start=rowstart,row_stop=rowend):
+            meta[0]['Total'] += 1
+            meta.append({key: data})
+
+    elif 'starttime' in formdata:
+        print "startttt"
+        rowstart=str(formdata['sysid']) + '-' + str(formdata['userid'])+'-' +str(formdata['starttime']) + '-'
+        rowend=str(formdata['sysid']) + '-' + str(formdata['userid'])+'-x'
+        for key, data in meta_table.scan(row_start=rowstart, row_stop=rowend):
+            meta[0]['Total'] += 1
+            meta.append({key: data})
+
+    elif 'endtime' in formdata:
+        rowstart = str(formdata['sysid']) + '-' + str(formdata['userid'])+'-'
+        rowend = str(formdata['sysid']) + '-' + str(formdata['userid'])+'-'+str(int(formdata['endtime'])+1) + '-'
+        print "Enddddddd"
+        for key, data in meta_table.scan(row_start=rowstart, row_stop=rowend):
+            meta[0]['Total'] += 1
+            meta.append({key: data})
+    else:
+        print("NOneeeee")
+        for key,data in meta_table.scan(row_prefix=str(formdata['sysid']) + '-' + str(formdata['userid'])+'-'):
+            meta[0]['Total'] += 1
+            meta.append({key: data})
+    con.close()
+
+    return meta
