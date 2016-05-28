@@ -12,12 +12,12 @@ class Upload(Resource):
     def post(self):
         file = request.files['file']
         formdata = request.form
-        filename = secure_filename(request.files['file'].filename)
-        path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        filename = secure_filename(request.files['file'].filename )
+        path = os.path.join(app.config['UPLOAD_FOLDER'], formdata['userid']+'-'+filename)
         file.save(path)
-        app.logger.debug('Caching  %s', filename)
+        app.logger.debug('Caching  %s', path)
 
-        metadata = metadata_man.genMeta(path,formdata)
+        metadata = metadata_man.genMeta(path,formdata,filename)
         encrypted_data_man.saveToStore(path,metadata)
 
         os.remove(path)

@@ -7,11 +7,11 @@ import happybase
 from phr_api import Master,MasterHbase, HDFSMainPath, largeSize, app
 import timeit
 
-def genMeta(path, formdata):
+def genMeta(path, formdata,filename):
     start = timeit.default_timer()
 
     size = os.path.getsize(path)
-    filename = os.path.basename(path)
+    #filename = os.path.basename(path)
     dataid = str(uuid.uuid4())
     checksum = hashlib.new("sha3_256")
     checksum = hashlib.sha3_256()
