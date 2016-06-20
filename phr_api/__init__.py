@@ -1,7 +1,9 @@
 __author__ = 'Maykungth'
 from flask import Flask
-from flask.ext.cors import CORS
+from flask_cors import CORS
 from flask_restful import Resource,Api
+
+
 
 app = Flask(__name__)
 CORS(app)
@@ -13,4 +15,4 @@ MasterHbase = '172.30.224.142'
 Master = '172.30.224.137'
 largeSize = 10000000 #10MB
 HDFSMainPath ='/DSePHR/'
-
+SSL_DIR = '/home/hduser/workspace/sslcert'
