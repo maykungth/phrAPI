@@ -33,7 +33,7 @@ start_time = time.time()
 listfile = glob.glob(path)
 # don't forgive to divide 12,  456 for each client
 
-for i in range(1,2):
+for i in range(1,4):
     if i % 100 == 0:
         listfile.append(str(parent_dir + '/enc_files/big/12videobig.mp4'))
     if (i-1) % 100 ==0:
@@ -48,8 +48,8 @@ for i in range(1,2):
         numtry = 0
         while numtry < 20:
             try:
-                res = requests.post('https://master:50000/upload', headers={'Authentication-Token':tokenkey},
-                                    files=files,data=payload, verify=cert_path)
+                res = requests.post('https://master:50000/upload',files=files,data=payload,
+                                     headers={'Authentication-Token':tokenkey},verify=cert_path)
                 break
             except requests.exceptions.RequestException as e:
                 print "ERROR: {}".format(e)
