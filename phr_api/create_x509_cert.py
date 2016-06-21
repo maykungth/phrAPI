@@ -2,7 +2,7 @@
 
 from OpenSSL import crypto
 from os.path import exists, join
-
+from socket import gethostname
 CERT_FILE = "ssl_DSePHR.crt"
 KEY_FILE = "ssl_DSePHR.key"
 
@@ -27,7 +27,7 @@ def create_self_signed_cert(cert_dir):
         cert.get_subject().L = "Hatyai"
         cert.get_subject().O = "PSU"
         cert.get_subject().OU = "LAB"
-        cert.get_subject().CN = "CN"
+        cert.get_subject().CN = gethostname()
         cert.set_serial_number(1000)
         cert.gmtime_adj_notBefore(0)
         cert.gmtime_adj_notAfter(10*365*24*60*60)
