@@ -3,12 +3,14 @@ __author__ = 'Maykungth'
 
 from flask import request, send_from_directory, make_response
 from flask_restful import Resource
+from flask_security import auth_token_required, current_user
 from werkzeug import secure_filename
 from phr_api import apirest, encrypted_data_man, app, metadata_man
 import os, timeit
 
 
 class Upload(Resource):
+    @auth_token_required
     def post(self):
         file = request.files['file']
         formdata = request.form
@@ -27,6 +29,7 @@ class Upload(Resource):
 
 
 class Download(Resource):
+    @auth_token_required
     def get(self,data_id):
         app.logger.debug('Get Request for download %s'%(data_id))
         startget = timeit.default_timer()
@@ -64,6 +67,11 @@ class Search(Resource):
 class Getinfor(Resource):
     def get(self,data_id):
         return metadata_man.getMeta(data_id)
+
+@app.route('/account', methods=['GET'])
+@auth_token_required
+def account():
+    return current_user.email #return current user
 
 def addroute():
     apirest.add_resource(Upload, '/upload')

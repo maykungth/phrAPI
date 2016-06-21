@@ -3,7 +3,7 @@ __author__ = 'Maykungth'
 # This file is a test upload file to Hbase
 import requests
 import datetime
-import glob
+import glob, json
 import time, os
 from random import randint
 from time import sleep
