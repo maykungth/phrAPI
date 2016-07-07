@@ -2,6 +2,7 @@ To run the DSePHR system
 
 1. edit config in phr_api/__init__.py and phr_api__runner.py
 2. run phr_api_runner.py
-3. Uses login_DSePHR.py to login (with SSL and get token key authen)
+3. Create HBase_schema with hbase_schema.py or create_hbase_schema_presplit.sh
+4. Uses login_DSePHR.py to login (with SSL and get token key authen)
 
-*require flask-security 1.7.5
+*require flask-security 1.7.5+
