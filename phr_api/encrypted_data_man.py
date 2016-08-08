@@ -57,6 +57,22 @@ def getFromStore(meta,rowkey):
         app.logger.debug(">> READ from Hbase %s",type(row_enc['enc:data']))
         return row_enc['enc:data']
 
+def delFromStore(meta,rowkey):
+    if 'pp:HDFSpath' in meta.keys():
+        # the data persist in HDFS
+        hdfs = PyWebHdfsClient(host=Master,port='50070', timeout=None,user_name='hduser')
+        hdfs.delete_file_dir(meta['pp:HDFSpath'])
+        app.logger.debug(">> DELETE from HDFS %s",meta['pp:HDFSpath'])
+        return True
+    else:
+        # the data persist in HBase
+        con = happybase.Connection(MasterHbase)
+        con.open()
+        enc_table = con.table('EncTable')
+        enc_table.delete(rowkey)
+        con.close()
+        app.logger.debug(">> DELETE from HBase %s",rowkey)
+        return True
 
 
 

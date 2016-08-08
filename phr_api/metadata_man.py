@@ -97,3 +97,11 @@ def searchMeta(formdata):
     con.close()
 
     return meta
+
+def delMeta(data_id):
+    con = happybase.Connection(MasterHbase)
+    con.open()
+    meta_table = con.table('MetaTable')
+    meta_table.delete(str(data_id))
+    con.close()
+    return True

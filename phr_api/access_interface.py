@@ -64,9 +64,30 @@ class Search(Resource):
             return metadata_man.searchMeta(request.form)
         return {'Message': 'Please specify the userid and sysid' , 'You send': request.form.keys()}
 
-class Getinfor(Resource):
+class EncData(Resource):
     def get(self,data_id):
-        return metadata_man.getMeta(data_id)
+        # get metadata from data_id
+        meta = metadata_man.getMeta(data_id)
+        if meta != None:
+            return meta
+        else:
+            return {'Message': 'File not found'}
+    def post(self,data_id):
+        # update encrypted data
+        return {}
+    def put(self,data_id):
+        # update the metadata by data_id
+        return {}
+    def delete(self,data_id):
+        # delete the enc data and metadata
+        meta = metadata_man.getMeta(data_id)
+        if meta != None:
+            encrypted_data_man.delFromStore(meta, data_id)
+            metadata_man.delMeta(data_id)
+        else:
+            return {'Message': 'File not found'}
+
+        return {'Message': 'File %s deleted'%(data_id)}
 
 @app.route('/account', methods=['GET'])
 @auth_token_required
@@ -78,4 +99,5 @@ def addroute():
     apirest.add_resource(Download, '/download/<string:data_id>')
     apirest.add_resource(Index,'/')
     apirest.add_resource(Search,'/search')
-    apirest.add_resource(Getinfor,'/infor/<string:data_id>')
+    apirest.add_resource(EncData,'/encdata/<string:data_id>')
+
