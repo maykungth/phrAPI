@@ -105,3 +105,15 @@ def delMeta(data_id):
     meta_table.delete(str(data_id))
     con.close()
     return True
+
+def updateMeta(data_id,formdata):
+    # Can update only filename, description and timestamp
+    con = happybase.Connection(MasterHbase)
+    con.open()
+    metaTable = con.table('MetaTable')
+
+    if 'filename' in formdata.keys():
+        metaTable.put(data_id,{'pp:name': str(formdata['filename'])})
+    if 'description' in formdata.keys():
+        metaTable.put(data_id,{'pp:des': str(formdata['description'])})
+

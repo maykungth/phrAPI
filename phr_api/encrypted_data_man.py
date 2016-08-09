@@ -22,7 +22,7 @@ def saveToStore(path,meta):
                 'pp:des': str(meta['description'])
                 }
               )
-        app.logger.debug('%s is saved to Hbase',meta['rowkey'])
+        app.logger.debug('%s is saved to Hbase', meta['rowkey'])
     else:
         # save to HDFS
         hdfs = PyWebHdfsClient(host=Master,port='50070', timeout=None,user_name='hduser')
@@ -37,7 +37,7 @@ def saveToStore(path,meta):
                 'pp:des': str(meta['description'])
                 }
               )
-        app.logger.debug('%s is saved to HDFS',meta['rowkey'])
+        app.logger.debug('%s is saved to HDFS', meta['rowkey'])
     con.close()
 
 def getFromStore(meta,rowkey):
