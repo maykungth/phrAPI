@@ -58,7 +58,8 @@ def getMeta(data_id):
     app.logger.debug('Time to getMeta %f'%(float(stop-start)))
     if meta_row == {}:
         return None
-    return meta_row
+    return {'filename':meta_row['pp:name'],'checksum':meta_row['pp:checksum'],'size':meta_row['pp:size'],
+            'description':meta_row['pp:des']}
 
 def searchMeta(formdata):
     con = happybase.Connection(MasterHbase)
