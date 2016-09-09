@@ -10,7 +10,7 @@ import os, timeit
 
 
 class Upload(Resource):
-    @auth_token_required
+    #@auth_token_required
     def post(self):
         file = request.files['file']
         formdata = request.form
@@ -29,13 +29,12 @@ class Upload(Resource):
 
 
 class Download(Resource):
-    @auth_token_required
+    #@auth_token_required
     def get(self,data_id):
         app.logger.debug('Get Request for download %s'%(data_id))
         startget = timeit.default_timer()
 
         meta= metadata_man.getMeta(data_id)
-
         if meta != None:
             start = timeit.default_timer()
             file = encrypted_data_man.getFromStore(meta,data_id)
@@ -43,7 +42,7 @@ class Download(Resource):
             app.logger.debug('Time to getEncryptedData %f'%(float(stop-start)))
             res = make_response(file)
             res.headers['Content-Type'] = 'application/octet-stream'
-            res.headers['Content-Disposition'] = 'attachment; filename="%s"' % meta['pp:name']
+            res.headers['Content-Disposition'] = 'attachment; filename="%s"' % meta['filename']
         else:
             return {'Message':'File not found'}
         stopget = timeit.default_timer()
