@@ -30,7 +30,7 @@ def genMeta(path, formdata,filename):
         description = formdata['description']
     else:
         description = ''
-    rowkey = formdata['sysid']+'-'+formdata['userid']+'-'+timestamp+'-'+dataid
+    rowkey = formdata['userid']+'-'+formdata['sysid']+'-'+timestamp+'-'+dataid
     stop=timeit.default_timer()
     app.logger.debug('Time to genMeta is %f' % (stop-start))
     return {
@@ -69,30 +69,30 @@ def searchMeta(formdata):
 
     if 'starttime' in formdata and 'endtime' in formdata:
         print("startttttt end endddd")
-        rowstart = str(formdata['sysid']) + '-' + str(formdata['userid'])+'-' + str(formdata['starttime']) + '-'
-        rowend = str(formdata['sysid']) + '-' + str(formdata['userid'])+'-'+str(int(formdata['endtime'])+1) + '-'
+        rowstart = str(formdata['userid']) + '-' + str(formdata['sysid'])+'-' + str(formdata['starttime']) + '-'
+        rowend = str(formdata['userid']) + '-' + str(formdata['sysid'])+'-'+str(int(formdata['endtime'])+1) + '-'
         for key, data in meta_table.scan(row_start=rowstart,row_stop=rowend):
             meta[0]['Total'] += 1
             meta.append({key: data})
 
     elif 'starttime' in formdata:
         print "startttt"
-        rowstart=str(formdata['sysid']) + '-' + str(formdata['userid'])+'-' +str(formdata['starttime']) + '-'
-        rowend=str(formdata['sysid']) + '-' + str(formdata['userid'])+'-x'
+        rowstart=str(formdata['userid']) + '-' + str(formdata['sysid'])+'-' +str(formdata['starttime']) + '-'
+        rowend=str(formdata['userid']) + '-' + str(formdata['sysid'])+'-x'
         for key, data in meta_table.scan(row_start=rowstart, row_stop=rowend):
             meta[0]['Total'] += 1
             meta.append({key: data})
 
     elif 'endtime' in formdata:
-        rowstart = str(formdata['sysid']) + '-' + str(formdata['userid'])+'-'
-        rowend = str(formdata['sysid']) + '-' + str(formdata['userid'])+'-'+str(int(formdata['endtime'])+1) + '-'
+        rowstart = str(formdata['userid']) + '-' + str(formdata['sysid'])+'-'
+        rowend = str(formdata['userid']) + '-' + str(formdata['sysid'])+'-'+str(int(formdata['endtime'])+1) + '-'
         print "Enddddddd"
         for key, data in meta_table.scan(row_start=rowstart, row_stop=rowend):
             meta[0]['Total'] += 1
             meta.append({key: data})
     else:
         print("NOneeeee")
-        for key,data in meta_table.scan(row_prefix=str(formdata['sysid']) + '-' + str(formdata['userid'])+'-'):
+        for key,data in meta_table.scan(row_prefix=str(formdata['userid']) + '-' + str(formdata['sysid'])+'-'):
             meta[0]['Total'] += 1
             meta.append({key: data})
     con.close()
