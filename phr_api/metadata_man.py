@@ -58,8 +58,11 @@ def getMeta(data_id):
     app.logger.debug('Time to getMeta %f'%(float(stop-start)))
     if meta_row == {}:
         return None
-    return {'filename':meta_row['pp:name'],'checksum':meta_row['pp:checksum'],'size':meta_row['pp:size'],
+    meta = {'filename':meta_row['pp:name'],'checksum':meta_row['pp:checksum'],'size':meta_row['pp:size'],
             'description':meta_row['pp:des']}
+    if 'pp:HDFSpath' in meta_row.keys():
+        meta['pp:HDFSpath'] = meta_row['pp:HDFSpath']
+    return meta
 
 def searchMeta(formdata):
     con = happybase.Connection(MasterHbase)
