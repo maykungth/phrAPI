@@ -6,11 +6,16 @@ from flask_restful import Resource
 from flask_security import auth_token_required, current_user
 from werkzeug import secure_filename
 from phr_api import apirest, encrypted_data_man, app, metadata_man
+from threading import Thread
 import os, timeit
 
+def saveThreading(path,metadata):
+    encrypted_data_man.saveToStore(path,metadata)
+    os.remove(path)
+    app.logger.debug('Cache is deleteed !')
 
 class Upload(Resource):
-    #@auth_token_required
+    @auth_token_required
     def post(self):
         file = request.files['file']
         formdata = request.form
@@ -20,16 +25,18 @@ class Upload(Resource):
         app.logger.debug('Caching  %s', path)
 
         metadata = metadata_man.genMeta(path,formdata,filename)
-        encrypted_data_man.saveToStore(path,metadata)
 
-        os.remove(path)
-        app.logger.debug('Cache is deleteed !')
-
+        # Move this part to threading
+        t= Thread(target=saveThreading, args=(path,metadata))
+        t.start()
+        # encrypted_data_man.saveToStore(path,metadata)
+        # os.remove(path)
+        # app.logger.debug('Cache is deleteed !')
         return metadata
 
 
 class Download(Resource):
-    #@auth_token_required
+    @auth_token_required
     def get(self,data_id):
         app.logger.debug('Get Request for download %s'%(data_id))
         startget = timeit.default_timer()
