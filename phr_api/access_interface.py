@@ -10,9 +10,13 @@ from threading import Thread
 import os, timeit
 
 def saveThreading(path,metadata):
-    encrypted_data_man.saveToStore(path,metadata)
-    os.remove(path)
-    app.logger.debug('Cache is deleteed !')
+    try :
+        encrypted_data_man.saveToStore(path,metadata)
+        os.remove(path)
+    except Exception as e:
+        app.logger.error("e {}".format(path))
+
+    app.logger.debug("Write and Clear {}".format(metadata['rowkey']))
 
 class Upload(Resource):
     @auth_token_required
@@ -40,7 +44,6 @@ class Download(Resource):
     def get(self,data_id):
         app.logger.debug('Get Request for download %s'%(data_id))
         startget = timeit.default_timer()
-
         meta= metadata_man.getMeta(data_id)
         if meta != None:
             start = timeit.default_timer()
