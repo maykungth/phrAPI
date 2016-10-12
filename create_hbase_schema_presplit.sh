@@ -12,15 +12,15 @@ do
     then
         if ((i<10))
         then
-        RS_KEY="$RS_KEY""'s00""$i',"
+        RS_KEY="$RS_KEY""'u00""$i',"
         elif ((i<100)) 
         then
-        RS_KEY="$RS_KEY""'s0""$i',"
+        RS_KEY="$RS_KEY""'u0""$i',"
         else
-        RS_KEY="$RS_KEY""'s""$i',"
+        RS_KEY="$RS_KEY""'u""$i',"
         fi
     else
-        RS_KEY="$RS_KEY""'s""$i'"
+        RS_KEY="$RS_KEY""'u""$i'"
     fi
 done
 RS_KEY="[$RS_KEY]"
