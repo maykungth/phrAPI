@@ -22,10 +22,6 @@ def genMeta(path, formdata,filename):
         timestamp = formdata['timestamp']
     else:
         timestamp = str(int(time.time()))
-    if 'often' in formdata.keys():
-        often = 'true'
-    else:
-        often = 'false'
     if 'description' in formdata.keys():
         description = formdata['description']
     else:
@@ -42,8 +38,8 @@ def genMeta(path, formdata,filename):
         'size': size,
         'checksum': checksum.hexdigest(),
         'rowkey': rowkey,
-        'often': often,
         'description': description,
+
     }
 
 def getMeta(data_id):
@@ -71,7 +67,6 @@ def searchMeta(formdata):
     meta=[{'Total':0}]
 
     if 'starttime' in formdata and 'endtime' in formdata:
-        print("startttttt end endddd")
         rowstart = str(formdata['userid']) + '-' + str(formdata['sysid'])+'-' + str(formdata['starttime']) + '-'
         rowend = str(formdata['userid']) + '-' + str(formdata['sysid'])+'-'+str(int(formdata['endtime'])+1) + '-'
         for key, data in meta_table.scan(row_start=rowstart,row_stop=rowend):
@@ -79,7 +74,6 @@ def searchMeta(formdata):
             meta.append({key: data})
 
     elif 'starttime' in formdata:
-        print "startttt"
         rowstart=str(formdata['userid']) + '-' + str(formdata['sysid'])+'-' +str(formdata['starttime']) + '-'
         rowend=str(formdata['userid']) + '-' + str(formdata['sysid'])+'-x'
         for key, data in meta_table.scan(row_start=rowstart, row_stop=rowend):
@@ -89,12 +83,10 @@ def searchMeta(formdata):
     elif 'endtime' in formdata:
         rowstart = str(formdata['userid']) + '-' + str(formdata['sysid'])+'-'
         rowend = str(formdata['userid']) + '-' + str(formdata['sysid'])+'-'+str(int(formdata['endtime'])+1) + '-'
-        print "Enddddddd"
         for key, data in meta_table.scan(row_start=rowstart, row_stop=rowend):
             meta[0]['Total'] += 1
             meta.append({key: data})
     else:
-        print("NOneeeee")
         for key,data in meta_table.scan(row_prefix=str(formdata['userid']) + '-' + str(formdata['sysid'])+'-'):
             meta[0]['Total'] += 1
             meta.append({key: data})

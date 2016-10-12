@@ -18,7 +18,6 @@ def saveToStore(path,meta):
                 'pp:name': str(meta['filename']),
                 'pp:checksum': str(meta['checksum']),
                 'pp:size': str(meta['size']),
-                'pp:often': str(meta['often']),
                 'pp:des': str(meta['description'])
                 }
               )
@@ -33,7 +32,6 @@ def saveToStore(path,meta):
                 'pp:checksum': str(meta['checksum']),
                 'pp:size': str(meta['size']),
                 'pp:HDFSpath': str(HDFSMainPath + meta['rowkey']),
-                'pp:often': str(meta['often']),
                 'pp:des': str(meta['description'])
                 }
               )
