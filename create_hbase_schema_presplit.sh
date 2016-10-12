@@ -1,14 +1,24 @@
 #!/bin/bash
 # NUM_RS is number of region servers in HBase cluster
-NUM_RS=4
+NUM_RS=15
 
 #{ BLOOMFILTER => 'ROW', VERSIONS => 1, BLOCKCACHE => true } are default
+NUM_RS=$NUM_RS+1
 RS_KEY=""
-for i in $(seq 2 $NUM_RS)
+step=$((1000/$NUM_RS))
+for ((i=step; i<1000 ; i+=step))
 do
-    if ((i!=$NUM_RS))
+    if ((i+step<1000))
     then
+        if ((i<10))
+        then
+        RS_KEY="$RS_KEY""'s00""$i',"
+        elif ((i<100)) 
+        then
+        RS_KEY="$RS_KEY""'s0""$i',"
+        else
         RS_KEY="$RS_KEY""'s""$i',"
+        fi
     else
         RS_KEY="$RS_KEY""'s""$i'"
     fi
