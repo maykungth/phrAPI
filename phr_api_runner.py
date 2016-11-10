@@ -13,4 +13,12 @@ if __name__ == '__main__':
     context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
     context.load_cert_chain(cert_key[0], cert_key[1])
 
-    app.run(host='0.0.0.0', debug=True, port=50000,threaded=True, ssl_context=context)
+    up = access_interface.UploadMonitor()
+    up.start()
+
+
+    app.run(host='0.0.0.0', debug=True, port=50000,threaded=True)#, ssl_context=context)
+
+    up.stop()
+    up.join()
+    print "finish"
