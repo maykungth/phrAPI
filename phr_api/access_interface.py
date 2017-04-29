@@ -6,102 +6,107 @@ from flask_restful import Resource
 from flask_security import auth_token_required, current_user
 from werkzeug import secure_filename
 from phr_api import apirest, encrypted_data_man, app, metadata_man
+from phr_api import logFormatter,rootLogger, consoleHandler
+
 from threading import Thread
+import threading
 import os, timeit,sys
 import time
 
 upload_queue = []
+upload_tasks = []
 
-
-class UploadMonitor(Thread):
+class UploadMonitor(threading.Thread):
     def __init__(self):
-        Thread.__init__(self)
+        threading.Thread.__init__(self)
         self.upload_task_size = 10
-        self.upload_tasks = []
-
+        #self.upload_tasks = []
         self.running = True
-
     def stop(self):
         self.running = False
-
     def run(self):
         while self.running:
             remove_tasks = []
-            for t in self.upload_tasks:
-                if not t.is_alive():
-                    t.join()
-                    remove_tasks.append(t)
-
-            for t in remove_tasks:
-                self.upload_tasks.remove(t)
-
-            while len(self.upload_tasks) < self.upload_task_size and len(upload_queue) > 0:
+            for dict_t in upload_tasks:
+                if not dict_t['thr'].is_alive():
+                    dict_t['thr'].join()
+                    remove_tasks.append(dict_t)
+            for dict_t in remove_tasks:
+                upload_tasks.remove(dict_t)
+            while len(upload_tasks) < self.upload_task_size and len(upload_queue) > 0:
                 args = upload_queue.pop(0)
                 t = Thread(target=saveThreading, args=(args['path'], args['metadata']))
                 t.start()
-
-                self.upload_tasks.append(t)
-
-            time.sleep(0.1)
-
-
+                name = "{}-{}".format(args['metadata']['filename'],args['metadata']['dataid'])
+                dict_t = dict(name=name,thr=t)
+                upload_tasks.append(dict_t)
+            time.sleep(0.05)
 
 def saveThreading(path,metadata):
     numtry = 0
     while numtry <= 5:
         try :
+            # start captured time here
+            start = timeit.default_timer()
             encrypted_data_man.saveToStore(path,metadata)
+            time_save_to_store = timeit.default_timer() - start
+            # end captured time
             os.remove(path)
-            app.logger.debug("Write and Clear {}".format(metadata['rowkey']))
+            # print time to upload to store.
+            # filename, rowkey, time, size
+            rootLogger.info("write,{},{},sec:{:.3f},size:{}".format(metadata['filename'],metadata['rowkey'],time_save_to_store,metadata['size']))
             break
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            app.logger.error("e {} {} {} {}".format(path,exc_type, fname, exc_tb.tb_lineno))
+            rootLogger.error("e {} {} {} {}".format(path,exc_type, fname, exc_tb.tb_lineno))
         numtry += 1
+def create_monitor_upload():
+    # Create monitor thread
+    up = UploadMonitor()
+    up.start()
+    return up
 
 class Upload(Resource):
-    @auth_token_required
+    #@auth_token_required
     def post(self):
         file = request.files['file']
         formdata = request.form
         filename = secure_filename(request.files['file'].filename )
-        path = os.path.join(app.config['UPLOAD_FOLDER'], formdata['userid']+'-'+filename)
+        path = os.path.join(app.config['UPLOAD_FOLDER'], formdata['userid']+'-'+formdata['sysid']+'-'+filename)
         file.save(path)
-        app.logger.debug('Caching  %s', path)
-
         metadata = metadata_man.genMeta(path,formdata,filename)
-
-        # Move this part to threading
-        # t= Thread(target=saveThreading, args=(path,metadata))
-        # t.start()
+        upload_queue_str = ""
         upload_queue.append(dict(path=path, metadata=metadata))
-        # encrypted_data_man.saveToStore(path,metadata)
-        # os.remove(path)
-        # app.logger.debug('Cache is deleteed !')
+        # show queue
+        for dict_t in upload_tasks:
+            upload_queue_str += "{};".format(dict_t['name'])
+        for x in upload_queue:
+            upload_queue_str += "{}-{};".format(x['metadata']['filename'],x['metadata']['dataid'])
+        # show queue 
+        rootLogger.info("queue_up,queue:{},{}".format(len(upload_queue)+len(upload_tasks),upload_queue_str))
+
         return metadata
 
 
 class Download(Resource):
-    @auth_token_required
+    #@auth_token_required
     def get(self,data_id):
-        app.logger.debug('Get Request for download %s'%(data_id))
         startget = timeit.default_timer()
         meta= metadata_man.getMeta(data_id)
         if meta != None:
             start = timeit.default_timer()
             file = encrypted_data_man.getFromStore(meta,data_id)
             stop = timeit.default_timer()
-            app.logger.debug('Time to getEncryptedData %f'%(float(stop-start)))
+            # app.logger.debug('Time to getEncryptedData %f'%(float(stop-start)))
             res = make_response(file)
             res.headers['Content-Type'] = 'application/octet-stream'
             res.headers['Content-Disposition'] = 'attachment; filename="%s"' % meta['filename']
         else:
             return {'Message':'File not found'}
         stopget = timeit.default_timer()
-        app.logger.debug('Time to Download data %f'%(float(stopget-startget)))
+        # app.logger.debug('Time to Download data %f'%(float(stopget-startget)))
         return res
-        # return send_from_directory(app.config['UPLOAD_FOLDER'], meta['pp:name'],as_attachment=True)
 
 
 class Index(Resource):

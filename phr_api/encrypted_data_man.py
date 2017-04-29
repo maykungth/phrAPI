@@ -21,7 +21,7 @@ def saveToStore(path,meta):
                 'pp:des': str(meta['description'])
                 }
               )
-        app.logger.debug('%s is saved to Hbase', meta['rowkey'])
+        #app.logger.debug('%s is saved to Hbase', meta['rowkey'])
     else:
         # save to HDFS
         hdfs = PyWebHdfsClient(host=Master,port='50070', timeout=None,user_name='hduser')
@@ -35,7 +35,7 @@ def saveToStore(path,meta):
                 'pp:des': str(meta['description'])
                 }
               )
-        app.logger.debug('%s is saved to HDFS', meta['rowkey'])
+        #app.logger.debug('%s is saved to HDFS', meta['rowkey'])
     con.close()
 
 def getFromStore(meta,rowkey):
@@ -43,7 +43,7 @@ def getFromStore(meta,rowkey):
         # retrieve from HDFS
         hdfs = PyWebHdfsClient(host=Master,port='50070', timeout=None,user_name='hduser')
         file = hdfs.read_file(meta['pp:HDFSpath'])
-        app.logger.debug(">> READ from HDFS %s",type(file))
+        #app.logger.debug(">> READ from HDFS %s",type(file))
         return file
     else:
         #retrieve from Hbase
@@ -52,7 +52,7 @@ def getFromStore(meta,rowkey):
         enc_table = con.table('EncTable')
         row_enc = enc_table.row(rowkey)
         con.close()
-        app.logger.debug(">> READ from Hbase %s",type(row_enc['enc:data']))
+        #app.logger.debug(">> READ from Hbase %s",type(row_enc['enc:data']))
         return row_enc['enc:data']
 
 def delFromStore(meta,rowkey):
@@ -60,7 +60,7 @@ def delFromStore(meta,rowkey):
         # the data persist in HDFS
         hdfs = PyWebHdfsClient(host=Master,port='50070', timeout=None,user_name='hduser')
         hdfs.delete_file_dir(meta['pp:HDFSpath'])
-        app.logger.debug(">> DELETE from HDFS %s",meta['pp:HDFSpath'])
+        #app.logger.debug(">> DELETE from HDFS %s",meta['pp:HDFSpath'])
         return True
     else:
         # the data persist in HBase
@@ -69,7 +69,7 @@ def delFromStore(meta,rowkey):
         enc_table = con.table('EncTable')
         enc_table.delete(rowkey)
         con.close()
-        app.logger.debug(">> DELETE from HBase %s",rowkey)
+        #app.logger.debug(">> DELETE from HBase %s",rowkey)
         return True
 
 

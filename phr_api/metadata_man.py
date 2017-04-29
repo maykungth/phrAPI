@@ -28,7 +28,7 @@ def genMeta(path, formdata,filename):
         description = ''
     rowkey = formdata['userid']+'-'+formdata['sysid']+'-'+timestamp+'-'+dataid
     stop=timeit.default_timer()
-    app.logger.debug('Time to genMeta is %f' % (stop-start))
+    #app.logger.debug('Time to genMeta is %f' % (stop-start))
     return {
         'sysid': formdata['sysid'],
         'userid': formdata['userid'],
@@ -51,7 +51,7 @@ def getMeta(data_id):
     meta_row = meta_table.row(str(data_id))
     con.close()
     stop = timeit.default_timer()
-    app.logger.debug('Time to getMeta %f'%(float(stop-start)))
+    #app.logger.debug('Time to getMeta %f'%(float(stop-start)))
     if meta_row == {}:
         return None
     meta = {'filename':meta_row['pp:name'],'checksum':meta_row['pp:checksum'],'size':meta_row['pp:size'],
